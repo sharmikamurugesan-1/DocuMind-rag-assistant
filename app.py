@@ -4,8 +4,18 @@ DocuMind — FastAPI Application & REST API
 
 import os
 from typing import Optional
-from pydantic import BaseModel
 from rag_engine import RAGEngine
+
+try:
+    from pydantic import BaseModel
+    class QueryRequest(BaseModel):
+        question: str
+        top_k: Optional[int] = 3
+except ImportError:
+    class QueryRequest:
+        def __init__(self, question: str, top_k: int = 3):
+            self.question = question
+            self.top_k = top_k
 
 try:
     from fastapi import FastAPI, HTTPException, UploadFile, File
@@ -22,10 +32,6 @@ DEFAULT_DOC = os.path.join(os.path.dirname(__file__), "sample_docs", "sla_agreem
 if os.path.exists(DEFAULT_DOC):
     with open(DEFAULT_DOC, "r", encoding="utf-8") as f:
         rag.add_document(f.read(), "sla_agreement.pdf")
-
-class QueryRequest(BaseModel):
-    question: str
-    top_k: Optional[int] = 3
 
 if app:
     app.add_middleware(
