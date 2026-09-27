@@ -1,0 +1,19 @@
+MASTER SERVICE & CLOUD SLA AGREEMENT
+Effective Date: January 1, 2025
+Parties: Global Tech Provider Inc. ("Provider") and Enterprise Client Corp. ("Client")
+
+SECTION 1: SCOPE OF SERVICES
+Provider agrees to deliver 99.9% uptime for cloud hosting and managed database services. Planned maintenance windows shall occur on Sundays between 02:00 UTC and 04:00 UTC with 72 hours prior notice.
+
+SECTION 2: REFUND POLICY & SLA CREDITS
+If monthly availability drops below 99.9%, Client is eligible for Service Credits:
+- 99.0% to 99.8%: 10% credit of monthly billing.
+- 95.0% to 98.9%: 25% credit of monthly billing.
+- Below 95.0%: 50% credit of monthly billing.
+
+SECTION 3: CONFIDENTIALITY & DATA PROTECTION
+All customer proprietary information, transaction databases, and source code shall remain strictly confidential. Provider agrees to comply with GDPR, SOC-2, and standard ISO 27001 data isolation policies.
+
+SECTION 4: TERMINATION & PENALTY CLAUSES
+Clause 4.1: Either party may terminate with 30 days written notice.
+Clause 4.2: In the event of late service delivery or milestone failure exceeding 14 business days, Provider shall incur a penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability.
