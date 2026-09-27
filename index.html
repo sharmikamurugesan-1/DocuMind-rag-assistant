@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocuMind — AI Document Q&A (RAG Assistant)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a10;
+      --card: rgba(20, 22, 35, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --peach: #fedec8;
+      --purple: #a855f7;
+      --green: #34d399;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; line-height: 1.6; padding: 40px 20px; }
+    .container { max-width: 1040px; margin: 0 auto; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 9999px; font-size: 13px; font-weight: 600; color: var(--purple); margin-bottom: 16px; }
+    h1 { font-size: clamp(32px, 4vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+    p.lead { font-size: 17px; color: var(--muted); margin-bottom: 32px; max-width: 680px; }
+    .grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+    .box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; backdrop-filter: blur(20px); }
+    .doc-preview { background: #06070a; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #cbd5e1; max-height: 250px; overflow-y: auto; margin-bottom: 16px; }
+    .q-chips { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .q-chip { text-align: left; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: #e2e8f0; font-size: 13px; cursor: pointer; transition: all .2s; }
+    .q-chip:hover, .q-chip.active { background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #fff; }
+    .answer-box { background: #06070a; border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 14px; }
+    .answer-text { font-size: 15px; color: #fff; line-height: 1.7; margin-bottom: 16px; }
+    .citation-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--muted); }
+    .citation-tag { color: var(--purple); font-weight: 700; margin-bottom: 2px; }
+    .back-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    .back-link { font-size: 13.5px; font-weight: 600; color: var(--muted); text-decoration: none; }
+    .back-link:hover { color: var(--purple); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="back-nav">
+      <a href="https://sharmikamurugesan-1.github.io/sharmika-portfolio/" class="back-link">← Back to Sharmika's Portfolio</a>
+      <a href="https://github.com/sharmikamurugesan-1/DocuMind-rag-assistant" target="_blank" class="back-link">GitHub Repository ↗</a>
+    </div>
+
+    <div class="badge">🧠 Case Study 03 — Live RAG Assistant Demo</div>
+    <h1>DocuMind Q&A</h1>
+    <p class="lead">Ask questions to any PDF or legal contract in plain English. Semantic vector search extracts the exact answer with page citations.</p>
+
+    <div class="grid">
+      <div class="box">
+        <h3 style="margin-bottom: 12px; font-size: 16px;">Active Document: Cloud SLA Agreement (42 Pages)</h3>
+        <div class="doc-preview">
+SECTION 1: SCOPE OF SERVICES
+Provider agrees to deliver 99.9% uptime for cloud hosting and managed database services. Planned maintenance windows shall occur on Sundays between 02:00 UTC and 04:00 UTC.
+
+SECTION 2: REFUND POLICY & SLA CREDITS
+If monthly availability drops below 99.9%, Client is eligible for Service Credits:
+- 99.0% to 99.8%: 10% credit of monthly billing.
+- 95.0% to 98.9%: 25% credit of monthly billing.
+- Below 95.0%: 50% credit of monthly billing.
+
+SECTION 4: PENALTY CLAUSES
+Clause 4.2: In the event of late service delivery exceeding 14 business days, Provider incurs a penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability.
+        </div>
+        <h4 style="margin-bottom: 10px; font-size: 14px; color: var(--muted);">Select a test query:</h4>
+        <div class="q-chips">
+          <button class="q-chip active" onclick="askQuestion(0)">What is the penalty for late service delivery?</button>
+          <button class="q-chip" onclick="askQuestion(1)">What service credits apply if uptime drops below 95%?</button>
+          <button class="q-chip" onclick="askQuestion(2)">When are scheduled maintenance windows permitted?</button>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3 style="margin-bottom: 14px; font-size: 16px;">DocuMind Cited Answer</h3>
+        <div class="answer-box">
+          <div class="answer-text" id="ansText">Loading cited answer...</div>
+          <div class="citation-card" id="ansCitation">
+            <div class="citation-tag" id="citSource">Source: SLA Agreement (Page 4, Clause 4.2)</div>
+            <div id="citExcerpt">"In the event of late service delivery exceeding 14 business days..."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ANSWERS = [
+      {
+        text: "Under Clause 4.2 of the agreement, if late service delivery exceeds 14 business days, the Provider incurs a penalty fee of 1.5% of the total contract value per week of delay, capped at a maximum of 15% aggregate liability.",
+        source: "Source: Cloud SLA Agreement (Page 4, Clause 4.2)",
+        excerpt: "Clause 4.2: Provider incurs a penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability."
+      },
+      {
+        text: "According to Section 2, if monthly service availability drops below 95.0%, the Client is eligible for a 50% service credit against their monthly billing.",
+        source: "Source: Cloud SLA Agreement (Page 2, Section 2)",
+        excerpt: "Section 2: Below 95.0%: 50% credit of monthly billing."
+      },
+      {
+        text: "Planned maintenance windows are permitted only on Sundays between 02:00 UTC and 04:00 UTC, requiring at least 72 hours prior written notice.",
+        source: "Source: Cloud SLA Agreement (Page 1, Section 1)",
+        excerpt: "Section 1: Planned maintenance windows shall occur on Sundays between 02:00 UTC and 04:00 UTC with 72 hours prior notice."
+      }
+    ];
+
+    function askQuestion(idx) {
+      document.querySelectorAll('.q-chip').forEach((c, i) => {
+        if(i === idx) c.classList.add('active'); else c.classList.remove('active');
+      });
+      const data = ANSWERS[idx];
+      document.getElementById('ansText').innerText = data.text;
+      document.getElementById('citSource').innerText = data.source;
+      document.getElementById('citExcerpt').innerText = `"${data.excerpt}"`;
+    }
+
+    askQuestion(0);
+  </script>
+</body>
+</html>
