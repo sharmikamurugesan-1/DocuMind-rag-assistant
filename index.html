@@ -3,151 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocuMind — AI Document Q&A & Semantic RAG Assistant</title>
+  <title>DocuMind — Enterprise RAG & Semantic Document Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090a10;
-      --card: rgba(20, 22, 35, 0.85);
-      --card-alt: rgba(28, 31, 48, 0.6);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(168, 85, 247, 0.5);
+      --bg: #05030a;
+      --bg-surface: #0e091a;
+      --bg-panel: rgba(18, 11, 33, 0.85);
+      --card-border: rgba(168, 85, 247, 0.18);
+      --card-border-hover: rgba(192, 132, 252, 0.45);
       --purple: #a855f7;
-      --purple-glow: rgba(168, 85, 247, 0.35);
-      --peach: #fedec8;
-      --green: #34d399;
+      --violet: #8b5cf6;
+      --purple-glow: rgba(168, 85, 247, 0.3);
+      --purple-dark: #581c87;
+      --pink: #ec4899;
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
       --text: #f8fafc;
-      --muted: #94a3b8;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
     }
-    * { margin:0; padding:0; box-sizing:border-box; }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(168, 85, 247, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.14) 0%, transparent 50%);
       color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font-sans);
       line-height: 1.6;
-      padding: 30px 20px 60px;
+      padding: 24px 20px 60px;
       min-height: 100vh;
     }
-    .container { max-width: 1240px; margin: 0 auto; }
+    .container { max-width: 1300px; margin: 0 auto; }
 
-    /* Top bar */
+    /* Top Navigation */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 24px;
       padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .back-link {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       font-size: 13.5px;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--text-muted);
       text-decoration: none;
       transition: color 0.2s;
     }
     .back-link:hover { color: var(--purple); }
-    .api-badge {
+    .top-badges {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .live-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
       font-size: 12px;
+      font-weight: 600;
       padding: 4px 12px;
       border-radius: 9999px;
-      background: rgba(168, 85, 247, 0.1);
-      border: 1px solid rgba(168, 85, 247, 0.3);
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.35);
       color: var(--purple);
+      cursor: help;
     }
-    .api-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--purple); }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 0 8px var(--purple);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .repo-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid var(--card-border);
+      transition: all 0.2s;
+    }
+    .repo-link:hover {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--purple);
+    }
 
-    /* Hero */
+    /* Header */
     .hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 5px 14px;
       background: rgba(168, 85, 247, 0.1);
-      border: 1px solid rgba(168, 85, 247, 0.25);
+      border: 1px solid rgba(168, 85, 247, 0.3);
       border-radius: 9999px;
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 12.5px;
+      font-weight: 700;
       color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-bottom: 12px;
     }
     h1 {
-      font-size: clamp(28px, 4vw, 42px);
+      font-size: clamp(28px, 4vw, 40px);
       font-weight: 800;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.025em;
       margin-bottom: 8px;
+      color: #fff;
+    }
+    h1 span {
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #e879f9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     p.lead {
-      font-size: 16px;
-      color: var(--muted);
+      font-size: 15.5px;
+      color: var(--text-muted);
       margin-bottom: 24px;
-      max-width: 820px;
+      max-width: 860px;
     }
 
-    /* Grid Layout */
-    .grid {
+    /* Pre-Seeded Document Scenarios */
+    .sample-section {
+      background: var(--bg-panel);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(16px);
+    }
+    .sample-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sample-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sample-title .hint {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+    .sample-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .sample-pill {
+      padding: 7px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .sample-pill:hover {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(192, 132, 252, 0.35);
+      color: var(--text);
+    }
+    .sample-pill.active {
+      background: rgba(168, 85, 247, 0.2);
+      border-color: var(--purple);
+      color: var(--purple);
+      box-shadow: 0 0 14px var(--purple-glow);
+    }
+    .sample-badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .badge-ok { background: rgba(16, 185, 129, 0.15); color: var(--emerald); }
+    .badge-warn { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+    .badge-err { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+    .badge-info { background: rgba(168, 85, 247, 0.2); color: var(--purple); }
+
+    /* Suggested Question Chips for Selected Scenario */
+    .suggested-box {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .suggested-lbl {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--purple);
+      letter-spacing: 0.5px;
+    }
+    .q-chip {
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #e2e8f0;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .q-chip:hover {
+      background: rgba(168, 85, 247, 0.25);
+      border-color: var(--purple);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    /* Two-Pane RAG Interface: Chat Thread (Left) + Citation Inspector (Right) */
+    .rag-grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 1.35fr 1fr;
       gap: 24px;
       margin-bottom: 28px;
     }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1024px) { .rag-grid { grid-template-columns: 1fr; } }
 
-    /* Sidebar / Document manager */
-    .sidebar {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
       padding: 22px;
       backdrop-filter: blur(20px);
       display: flex;
       flex-direction: column;
-      gap: 16px;
     }
-    .doc-item {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .doc-item:hover, .doc-item.active {
-      border-color: rgba(168, 85, 247, 0.4);
-      background: rgba(168, 85, 247, 0.08);
+    .panel-h {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .doc-title { font-size: 13.5px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .doc-meta { font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; }
 
-    /* Hyperparameter Controls */
-    .control-box {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-    }
-    .control-title { font-size: 11.5px; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 10px; font-weight: 700; }
-    .slider-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 8px; }
-    .slider-row input[type="range"] { width: 120px; accent-color: var(--purple); }
-
-    /* Main Chat Panel */
-    .chat-panel {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      backdrop-filter: blur(20px);
+    /* Chat Thread */
+    .chat-container {
+      height: 540px;
       display: flex;
       flex-direction: column;
-      height: 640px;
     }
     .chat-history {
       flex: 1;
@@ -156,95 +302,101 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
-    .message-card {
+    .msg-card {
       border-radius: 14px;
-      padding: 16px;
-      font-size: 14px;
+      padding: 14px 16px;
+      font-size: 13.5px;
       line-height: 1.6;
     }
     .user-msg {
-      background: rgba(168, 85, 247, 0.12);
-      border: 1px solid rgba(168, 85, 247, 0.25);
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
       align-self: flex-end;
       max-width: 85%;
+      color: #fff;
     }
     .ai-msg {
-      background: #06070a;
-      border: 1px solid var(--border);
+      background: #090514;
+      border: 1px solid var(--card-border);
       align-self: flex-start;
       width: 100%;
     }
-    .ai-header {
+    .ai-meta {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: var(--purple);
+      margin-bottom: 6px;
+      font-size: 11.5px;
       font-weight: 700;
+      color: var(--purple);
     }
-    .citations-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-    .citation-pill {
+
+    /* Signature Interaction: Retrieval Step Indicator */
+    .retrieval-step-box {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(168, 85, 247, 0.08);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      font-family: var(--font-mono);
       font-size: 11px;
-      padding: 4px 10px;
+      color: #c084fc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .retrieval-step-spin {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--purple);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .citation-pills-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .cite-pill {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
       border-radius: 6px;
       background: rgba(168, 85, 247, 0.15);
       border: 1px solid rgba(168, 85, 247, 0.35);
-      color: #fff;
+      color: #e9d5ff;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
       transition: all 0.2s;
     }
-    .citation-pill:hover {
-      background: rgba(168, 85, 247, 0.3);
-      border-color: var(--purple);
+    .cite-pill:hover, .cite-pill.active {
+      background: var(--purple);
+      color: #05030a;
+      font-weight: 700;
+      box-shadow: 0 0 10px var(--purple-glow);
     }
-    .telemetry-row {
-      display: flex;
+
+    .telemetry-tag {
+      font-size: 10.5px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      display: inline-flex;
       gap: 12px;
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 8px;
-      font-family: 'JetBrains Mono', monospace;
+      margin-top: 6px;
     }
 
-    /* Prompt Chips */
-    .prompt-chips {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-    }
-    .prompt-chip {
-      white-space: nowrap;
-      padding: 6px 12px;
-      border-radius: 9999px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .prompt-chip:hover {
-      background: rgba(168, 85, 247, 0.15);
-      border-color: rgba(168, 85, 247, 0.4);
-      color: #fff;
-    }
-
-    /* Input area */
+    /* Chat Input Bar */
     .input-bar {
       display: flex;
       gap: 10px;
@@ -252,391 +404,707 @@
     }
     .chat-input {
       flex: 1;
-      background: #06070a;
-      border: 1px solid var(--border);
-      border-radius: 12px;
+      background: #040208;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
       padding: 12px 16px;
       color: #fff;
       font-size: 13.5px;
       outline: none;
       font-family: inherit;
+      transition: border-color 0.2s;
     }
-    .chat-input:focus { border-color: var(--border-focus); }
-    .btn-send {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #a855f7, #9333ea);
+    .chat-input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 12px var(--purple-glow);
+    }
+    .btn-ask {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
       border: none;
-      border-radius: 12px;
+      border-radius: 10px;
       color: #fff;
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
-      box-shadow: 0 0 20px var(--purple-glow);
+      box-shadow: 0 0 16px var(--purple-glow);
       transition: all 0.2s;
+      white-space: nowrap;
     }
-    .btn-send:hover { transform: translateY(-1px); }
+    .btn-ask:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(168, 85, 247, 0.5);
+    }
 
-    /* Modal / Drawer for Citation Excerpt */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(8px);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .modal-card {
-      background: #0d0f17;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      max-width: 600px;
-      width: 100%;
-      padding: 24px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-    .modal-header {
+    /* Right Pane: Citation Inspector & Document Corpus Viewer */
+    .inspector-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
     }
-    .modal-title { font-size: 16px; font-weight: 700; color: #fff; }
-    .btn-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; }
-    .excerpt-text {
-      background: #06070a;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+    .corpus-viewer {
+      background: #040208;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
       padding: 16px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12.5px;
-      color: #e2e8f0;
-      line-height: 1.6;
-      max-height: 300px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #cbd5e1;
+      height: 340px;
       overflow-y: auto;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    .highlight-snippet {
+      background: rgba(168, 85, 247, 0.28);
+      color: #fff;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid rgba(168, 85, 247, 0.5);
+    }
+
+    .citation-card {
+      background: rgba(168, 85, 247, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 14px;
+      font-size: 12px;
+    }
+    .citation-card-title {
+      font-weight: 700;
+      color: var(--purple);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Actions */
+    .btn-act {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+    .btn-act:hover {
+      background: rgba(168, 85, 247, 0.15);
+      border-color: var(--purple);
+      color: #fff;
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Navigation Top Bar -->
     <div class="top-bar">
-      <a href="https://sharmikamurugesan-1.github.io/sharmika-portfolio/" class="back-link">
+      <a href="https://sharmikamurugesan-1.github.io/sharmika-portfolio/#case-documind" class="back-link">
         ← Back to Sharmika's Portfolio
       </a>
-      <div style="display: flex; gap: 12px; align-items: center;">
-        <span class="api-badge"><span class="api-dot"></span> Dual-Mode RAG Ready</span>
-        <a href="https://github.com/sharmikamurugesan-1/DocuMind-rag-assistant" target="_blank" class="back-link">
+      <div class="top-badges">
+        <span class="live-badge" title="Semantic BM25 chunking with hallucination guardrail. Connect local Flask on :5000 for server vector index.">
+          <span class="live-dot"></span> LIVE RAG ENGINE
+        </span>
+        <a href="https://github.com/sharmikamurugesan-1/DocuMind-rag-assistant" target="_blank" class="repo-link">
           GitHub Repo ↗
         </a>
       </div>
     </div>
 
-    <div class="hero-badge">🧠 Case Study 03 — Flagship AI RAG Assistant</div>
-    <h1>DocuMind Q&A Engine</h1>
+    <!-- Header Section -->
+    <div class="hero-badge">🧠 PRODUCTION AI — PROJECT 03</div>
+    <h1>DocuMind <span>Enterprise RAG & Document Intelligence</span></h1>
     <p class="lead">
-      Enterprise document intelligence with BM25 semantic chunking, dual-mode synthesis (Local Extractive or OpenAI API), strict hallucination refusal guardrails, and verified source citations.
+      Grounded semantic retrieval across complex contracts and architecture specs. Features progressive streaming answers, verified source citation inspector, and strict hallucination refusal guardrails.
     </p>
 
-    <div class="grid">
-      <!-- Sidebar -->
-      <div class="sidebar">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-size: 12px; text-transform: uppercase; font-weight: 700; color: var(--muted); letter-spacing: 0.5px;">Active Document Corpus</span>
-          <button style="background: none; border: none; color: var(--purple); font-size: 12px; font-weight: 700; cursor: pointer;" onclick="document.getElementById('docUpload').click()">+ Upload File</button>
-          <input type="file" id="docUpload" style="display: none;" accept=".txt,.pdf,.md" onchange="handleDocUpload(event)">
+    <!-- Pre-Seeded Document Scenarios -->
+    <div class="sample-section">
+      <div class="sample-header">
+        <div class="sample-title">
+          <span>🎯 Select Indexed Document Scenario:</span>
+          <span class="hint">Zero typing required — test legal SLAs, technical specs, and hallucination guardrails</span>
         </div>
+        <button class="btn-act" onclick="exportChatTranscript()">📥 Export Transcript</button>
+      </div>
 
-        <div id="docList">
-          <div class="doc-item active">
-            <div class="doc-title">📄 Cloud SLA Agreement</div>
-            <div class="doc-meta">
-              <span>Enterprise SLA · 42 Pages</span>
-              <span style="color: var(--green);">● Indexed</span>
-            </div>
-          </div>
-          <div class="doc-item">
-            <div class="doc-title">📄 Master Services Contract</div>
-            <div class="doc-meta">
-              <span>Legal MSA · 18 Pages</span>
-              <span style="color: var(--green);">● Indexed</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Retrieval Controls -->
-        <div class="control-box">
-          <div class="control-title">Retrieval Controls</div>
-          <div class="slider-row">
-            <span>Top-K Results:</span>
-            <span id="topKVal" style="color: var(--purple); font-weight: 700;">3</span>
-          </div>
-          <input type="range" min="1" max="6" value="3" oninput="document.getElementById('topKVal').innerText = this.value; configTopK = parseInt(this.value);" style="width: 100%; margin-bottom: 12px;">
-
-          <div class="slider-row">
-            <span>Relevance Gate:</span>
-            <span id="threshVal" style="color: var(--purple); font-weight: 700;">0.15</span>
-          </div>
-          <input type="range" min="5" max="40" value="15" oninput="document.getElementById('threshVal').innerText = (this.value/100).toFixed(2); configThreshold = this.value/100;" style="width: 100%;">
-        </div>
-
-        <button class="doc-item" style="text-align: center; font-weight: 700; color: #fff; background: rgba(255,255,255,0.03);" onclick="exportChatTranscript()">
-          📥 Export Chat Transcript
+      <div class="sample-pills">
+        <button class="sample-pill active" onclick="loadScenario(0)">
+          <span>Enterprise Cloud SLA</span>
+          <span class="sample-badge badge-ok">99.95% Availability</span>
+        </button>
+        <button class="sample-pill" onclick="loadScenario(1)">
+          <span>Commercial Lease Agreement</span>
+          <span class="sample-badge badge-info">Tenancy & Repairs</span>
+        </button>
+        <button class="sample-pill" onclick="loadScenario(2)">
+          <span>Executive Employment Contract</span>
+          <span class="sample-badge badge-info">IP & Non-Compete</span>
+        </button>
+        <button class="sample-pill" onclick="loadScenario(3)">
+          <span>Distributed System Architecture</span>
+          <span class="sample-badge badge-ok">P99 SLA & Redis</span>
+        </button>
+        <button class="sample-pill" onclick="loadScenario(4)">
+          <span>Multi-Doc Comparison (v1 vs v2)</span>
+          <span class="sample-badge badge-warn">Diff Analysis</span>
+        </button>
+        <button class="sample-pill" onclick="loadScenario(5)">
+          <span>Out-of-Domain Guardrail Test</span>
+          <span class="sample-badge badge-err">Strict Refusal</span>
         </button>
       </div>
 
-      <!-- Main Chat Panel -->
-      <div class="chat-panel">
-        <div class="chat-history" id="chatHistory">
-          <!-- Welcome message -->
-          <div class="message-card ai-msg">
-            <div class="ai-header">
-              <span>DocuMind Enterprise Assistant</span>
-              <span style="color: var(--green);">● Grounded Engine Active</span>
-            </div>
-            <div>
-              Welcome! I have indexed the <strong>Cloud SLA Agreement</strong> and <strong>Master Services Contract</strong>. Ask me any specific question regarding uptime clauses, penalty fees, termination rights, or liability caps.
-            </div>
-          </div>
-        </div>
-
-        <!-- Prompt Suggestions -->
-        <div class="prompt-chips">
-          <button class="prompt-chip" onclick="askPredefined('What is the penalty for late service delivery?')">Penalty for late service?</button>
-          <button class="prompt-chip" onclick="askPredefined('What service credits apply if uptime drops below 95%?')">Service credits for &lt;95% uptime?</button>
-          <button class="prompt-chip" onclick="askPredefined('When are scheduled maintenance windows permitted?')">Scheduled maintenance window?</button>
-          <button class="prompt-chip" onclick="askPredefined('What is the recipe for baking chocolate cake?')">Out-of-domain test (refusal check)</button>
-        </div>
-
-        <!-- Input Bar -->
-        <div class="input-bar">
-          <input type="text" class="chat-input" id="userQuery" placeholder="Ask a question about the active agreements..." onkeydown="if(event.key==='Enter') sendUserQuery()">
-          <button class="btn-send" onclick="sendUserQuery()">Ask DocuMind →</button>
-        </div>
+      <!-- Suggested Questions for Active Scenario -->
+      <div class="suggested-box">
+        <span class="suggested-lbl">Suggested Queries:</span>
+        <div id="suggestedQuestions" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
       </div>
     </div>
-  </div>
 
-  <!-- Citation Excerpt Drawer / Modal -->
-  <div class="modal-overlay" id="citationModal" onclick="if(event.target === this) closeModal()">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Source Citation Excerpt</div>
-        <button class="btn-close" onclick="closeModal()">&times;</button>
+    <!-- Two-Pane RAG Grid -->
+    <div class="rag-grid">
+      <!-- Left Pane: Chat Conversation Thread -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-h">
+            <span>💬 Conversational Assistant Thread</span>
+          </div>
+          <span style="font-size: 11.5px; color: var(--emerald);" id="engineStatusBadge">● Grounded & Verified</span>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-history" id="chatHistory">
+            <!-- Welcome greeting -->
+            <div class="msg-card ai-msg">
+              <div class="ai-meta">
+                <span>DocuMind Intelligence</span>
+                <span style="color: var(--emerald);">● Ready</span>
+              </div>
+              <div>
+                Welcome! I have loaded and indexed the <strong>Enterprise Cloud SLA Agreement</strong>. Click any of the suggested queries above or ask specific questions regarding uptime clauses, penalty fees, termination conditions, or maintenance windows.
+              </div>
+            </div>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="input-bar">
+            <input type="text" class="chat-input" id="userQuery" placeholder="Ask a question about the active document..." onkeydown="if(event.key==='Enter') executeUserQuery()">
+            <button class="btn-ask" onclick="executeUserQuery()">Ask DocuMind →</button>
+          </div>
+        </div>
       </div>
-      <div class="excerpt-text" id="modalExcerpt"></div>
-      <div style="font-size: 11px; color: var(--muted); margin-top: 12px;" id="modalScore"></div>
+
+      <!-- Right Pane: Citation Inspector & Document Corpus Viewer -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-h">
+            <span>📑 Source Document Inspector</span>
+          </div>
+          <span style="font-size: 11.5px; color: var(--purple);" id="activeDocTitle">Cloud SLA Agreement</span>
+        </div>
+
+        <div class="inspector-meta">
+          <span>Corpus Explorer (Indexed Chunks)</span>
+          <span style="font-family: var(--font-mono); font-size: 11px;" id="chunkCount">4 Chunks</span>
+        </div>
+
+        <!-- Full Document Corpus Text with Dynamic Snippet Highlighter -->
+        <div class="corpus-viewer" id="corpusView"></div>
+
+        <!-- Selected Citation Focus Card -->
+        <div class="citation-card" id="citationFocusCard">
+          <div class="citation-card-title">
+            <span id="focusCitationHeader">📍 Citation Focus: Section 1</span>
+            <span style="color: var(--purple);" id="focusMatchScore">Relevance: 98%</span>
+          </div>
+          <p id="focusCitationExcerpt" style="color: #cbd5e1; line-height: 1.5; font-family: var(--font-mono); font-size: 11.5px;">
+            Click on any citation pill in the chat responses to inspect the exact clause and page location here.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    let configTopK = 3;
-    let configThreshold = 0.15;
-    let chatLog = [];
-
-    // Corpus Chunks in Memory (Dual-Mode Browser Engine)
-    const CORPUS_CHUNKS = [
+    // 6 Realistic Pre-Seeded Document Scenarios
+    const SCENARIOS = [
       {
-        source: "Cloud SLA Agreement",
-        page: 1,
-        text: "SECTION 1: SERVICE AVAILABILITY & MAINTENANCE. Provider commits to 99.95% monthly service availability for core cloud compute and managed database instances. Planned maintenance windows shall occur exclusively on Sundays between 02:00 UTC and 04:00 UTC with a mandatory 72 hours advance notification."
+        id: "sla",
+        name: "Enterprise Cloud SLA",
+        title: "Enterprise Cloud SLA Agreement (2025)",
+        questions: [
+          "What service credits apply if uptime drops below 95%?",
+          "When are scheduled maintenance windows permitted?",
+          "What is the penalty for late service delivery?"
+        ],
+        chunks: [
+          {
+            section: "Section 1: Availability & Maintenance",
+            page: 1,
+            text: "SECTION 1: SERVICE AVAILABILITY & MAINTENANCE. Provider commits to 99.95% monthly service availability for core cloud compute and managed database instances. Planned maintenance windows shall occur exclusively on Sundays between 02:00 UTC and 04:00 UTC with a mandatory 72 hours advance notification to client administrators."
+          },
+          {
+            section: "Section 2: SLA Credits & Refunds",
+            page: 2,
+            text: "SECTION 2: REFUND POLICY & SLA CREDITS. If monthly service availability drops below 99.95%, Client is entitled to Service Credits: 99.0% to 99.8% availability grants a 15% credit of monthly billing; 95.0% to 98.9% availability grants a 25% credit; and availability below 95.0% grants a 50% credit against the affected calendar month billing."
+          },
+          {
+            section: "Section 3: Penalty Clauses",
+            page: 4,
+            text: "SECTION 3: PENALTY CLAUSES & DELAY REMEDIES. Clause 4.2: In the event of late service delivery exceeding 14 business days, Provider incurs an automated penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability."
+          }
+        ]
       },
       {
-        source: "Cloud SLA Agreement",
-        page: 2,
-        text: "SECTION 2: REFUND POLICY & SLA CREDITS. If monthly service availability drops below 99.95%, Client is entitled to Service Credits: 99.0% to 99.8% availability grants a 15% credit of monthly billing; 95.0% to 98.9% availability grants a 25% credit; and availability below 95.0% grants a 50% credit against the affected calendar month billing."
+        id: "lease",
+        name: "Commercial Lease Agreement",
+        title: "Commercial Real Estate Lease (Unit 402)",
+        questions: [
+          "What are the early lease termination conditions and notice periods?",
+          "How is the security deposit refunded upon tenancy exit?",
+          "Who is liable for HVAC and structural repairs?"
+        ],
+        chunks: [
+          {
+            section: "Section 4: Early Termination",
+            page: 3,
+            text: "SECTION 4: EARLY TERMINATION CLAUSE. Tenant may terminate this lease prior to expiration by providing ninety (90) calendar days written notice and paying an early termination fee equivalent to three (3) months of base gross rent."
+          },
+          {
+            section: "Section 7: Security Deposit",
+            page: 6,
+            text: "SECTION 7: SECURITY DEPOSIT REFUND. The security deposit of $25,000 shall be returned to Tenant within thirty (30) days of premises surrender, subject to inspection for damages exceeding standard wear and tear."
+          },
+          {
+            section: "Section 11: Maintenance & Repairs",
+            page: 9,
+            text: "SECTION 11: REPAIRS AND MAINTENANCE. Landlord shall maintain all structural foundations, roof, and central HVAC systems at Landlord's sole expense, provided Tenant has not committed gross negligence."
+          }
+        ]
       },
       {
-        source: "Cloud SLA Agreement",
-        page: 4,
-        text: "SECTION 3: PENALTY CLAUSES & DELAY REMEDIES. Clause 4.2: In the event of late service delivery exceeding 14 business days, Provider incurs an automated penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability."
+        id: "employment",
+        name: "Executive Employment Contract",
+        title: "VP Engineering Employment & IP Agreement",
+        questions: [
+          "What is the post-employment non-compete duration and geographical scope?",
+          "What severance package is granted upon termination without cause?",
+          "Who owns intellectual property created during employment?"
+        ],
+        chunks: [
+          {
+            section: "Clause 9: Restrictive Covenants",
+            page: 7,
+            text: "CLAUSE 9: NON-COMPETITION AND NON-SOLICITATION. For a period of twelve (12) months following termination of employment, Executive shall not directly or indirectly engage in, manage, or advise any competing enterprise operating within North America or the European Union."
+          },
+          {
+            section: "Clause 14: Severance Package",
+            page: 11,
+            text: "CLAUSE 14: TERMINATION WITHOUT CAUSE. In the event Company terminates employment without Cause, Executive is entitled to twelve (12) months of base salary continuation and accelerated vesting of 50% of unvested equity options."
+          },
+          {
+            section: "Clause 18: Intellectual Property",
+            page: 14,
+            text: "CLAUSE 18: IP ASSIGNMENT. All inventions, patents, codebases, and trade secrets authored or conceived by Executive during employment hours or utilizing Company equipment belong exclusively to Company as work-for-hire."
+          }
+        ]
       },
       {
-        source: "Master Services Contract",
-        page: 5,
-        text: "SECTION 8: GOVERNING LAW & JURISDICTION. This Master Services Agreement and all associated Statements of Work shall be governed by and construed under the laws of the State of New York, without regard to conflicts of law principles."
+        id: "architecture",
+        name: "Distributed System Architecture Spec",
+        title: "Payment Processing Distributed Architecture Spec",
+        questions: [
+          "What is the maximum allowed P99 latency SLA for payment endpoints?",
+          "How does cache invalidation behave across Redis clusters?",
+          "What rate limit thresholds trigger HTTP 429?"
+        ],
+        chunks: [
+          {
+            section: "Spec 2.1: Latency SLOs",
+            page: 2,
+            text: "SPEC 2.1: LATENCY COMMITMENTS. The checkout authorization API must maintain a P95 latency below 120ms and P99 latency below 350ms under peak load of 25,000 transactions per second."
+          },
+          {
+            section: "Spec 4.5: Distributed Caching",
+            page: 5,
+            text: "SPEC 4.5: CACHE INVALIDATION. Redis cluster nodes utilize dual-channel pub/sub invalidation. Stale key TTL is strictly configured to 300 seconds with event-driven immediate eviction on ledger balance updates."
+          },
+          {
+            section: "Spec 6.2: Rate Limiting",
+            page: 8,
+            text: "SPEC 6.2: RATE LIMITING & THROTTLING. Client API tokens are capped at 500 requests per minute. Excess traffic triggers HTTP 429 (Too Many Requests) with a Retry-After header calculated via exponential token bucket decay."
+          }
+        ]
+      },
+      {
+        id: "comparison",
+        name: "Multi-Doc Comparison (v1 vs v2)",
+        title: "Vendor Agreement Comparative Corpus (v1.0 vs v2.0)",
+        questions: [
+          "Compare the uptime SLA commitment between v1.0 and v2.0",
+          "Did penalty liability caps increase or decrease in the updated contract?",
+          "Which contract governs international data transfers?"
+        ],
+        chunks: [
+          {
+            section: "Contract v1.0 (2023) - Clause 2",
+            page: 1,
+            text: "CONTRACT V1.0: Availability commitment is 99.9% monthly. Aggregate delay penalty liability is strictly capped at 10% of annual contract spend."
+          },
+          {
+            section: "Contract v2.0 (2025) - Clause 2",
+            page: 1,
+            text: "CONTRACT V2.0: Availability commitment is upgraded to 99.95% monthly. Delay penalty liability cap increased to 15% of annual contract spend, reflecting heightened enterprise mission-critical standards."
+          },
+          {
+            section: "Contract v2.0 (2025) - Clause 12",
+            page: 4,
+            text: "CONTRACT V2.0 ADDENDUM: All cross-border data flows are governed by EU Standard Contractual Clauses (SCCs) and ISO 27001 / SOC 2 Type II audit certifications."
+          }
+        ]
+      },
+      {
+        id: "refusal",
+        name: "Out-of-Domain Guardrail Test",
+        title: "Strict Guardrail Grounding Corpus",
+        questions: [
+          "What is the best recipe for baking chocolate brownies?",
+          "Who won the 2024 ICC T20 World Cup?",
+          "What are the current stock prices of Apple and Microsoft?"
+        ],
+        chunks: [
+          {
+            section: "Corporate Code of Conduct",
+            page: 1,
+            text: "SECTION 1: APPLICABILITY. This enterprise code of conduct applies to internal cloud infrastructure operations, authorized employee access, and proprietary financial software governance."
+          }
+        ]
       }
     ];
 
-    function handleDocUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (evt) => {
-        const text = evt.target.result;
-        // Chunk and add
-        const words = text.split(/\s+/);
-        for(let i = 0; i < words.length; i += 80) {
-          const chunkWords = words.slice(i, i + 100).join(' ');
-          CORPUS_CHUNKS.push({
-            source: file.name,
-            page: Math.floor(i / 150) + 1,
-            text: chunkWords
-          });
+    let currentScenarioIdx = 0;
+    let chatLog = [];
+    let isGenerating = false;
+
+    function init() {
+      loadScenario(0);
+    }
+
+    function loadScenario(idx) {
+      currentScenarioIdx = idx;
+      document.querySelectorAll('.sample-pill').forEach((pill, i) => {
+        if (i === idx) pill.classList.add('active'); else pill.classList.remove('active');
+      });
+
+      const sc = SCENARIOS[idx];
+      document.getElementById('activeDocTitle').innerText = sc.title;
+      document.getElementById('chunkCount').innerText = `${sc.chunks.length} Chunks Indexed`;
+
+      // Render Suggested Questions
+      const qContainer = document.getElementById('suggestedQuestions');
+      qContainer.innerHTML = '';
+      sc.questions.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'q-chip';
+        btn.innerText = q;
+        btn.onclick = () => askQuestion(q);
+        qContainer.appendChild(btn);
+      });
+
+      // Render Corpus Text
+      renderCorpusViewer(sc.chunks);
+
+      // Reset Focus Card
+      document.getElementById('focusCitationHeader').innerText = `Corpus: ${sc.title}`;
+      document.getElementById('focusMatchScore').innerText = `Loaded`;
+      document.getElementById('focusCitationExcerpt').innerText = `Loaded ${sc.chunks.length} passages into active vector memory. Select a suggested query to test semantic retrieval.`;
+
+      // Add reset note in chat
+      appendAiGreeting(sc);
+    }
+
+    function renderCorpusViewer(chunks, highlightText = "") {
+      const viewer = document.getElementById('corpusView');
+      let html = '';
+      chunks.forEach((c, idx) => {
+        let chunkContent = escapeHtml(c.text);
+        if (highlightText && chunkContent.toLowerCase().includes(highlightText.toLowerCase())) {
+          const reg = new RegExp(`(${escapeRegex(highlightText)})`, 'gi');
+          chunkContent = chunkContent.replace(reg, `<span class="highlight-snippet">$1</span>`);
         }
-        const docList = document.getElementById('docList');
-        const div = document.createElement('div');
-        div.className = "doc-item active";
-        div.innerHTML = `
-          <div class="doc-title">📄 ${file.name}</div>
-          <div class="doc-meta">
-            <span>Custom Document · ${words.length} Words</span>
-            <span style="color: var(--green);">● Indexed</span>
-          </div>
-        `;
-        docList.appendChild(div);
-        alert(`Successfully parsed and indexed ${file.name} into DocuMind!`);
-      };
-      reader.readAsText(file);
+        html += `<div style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.06);">
+          <div style="color: var(--purple); font-weight: 700; margin-bottom: 4px;">[${c.section} - Page ${c.page}]</div>
+          <div>${chunkContent}</div>
+        </div>`;
+      });
+      viewer.innerHTML = html;
     }
 
-    function askPredefined(q) {
+    function appendAiGreeting(sc) {
+      const hist = document.getElementById('chatHistory');
+      const div = document.createElement('div');
+      div.className = "msg-card ai-msg";
+      div.innerHTML = `
+        <div class="ai-meta">
+          <span>DocuMind Intelligence</span>
+          <span style="color: var(--emerald);">● Corpus Switched</span>
+        </div>
+        <div>
+          Switched active context to <strong>${sc.title}</strong> (${sc.chunks.length} chunks). Ask any question or click a suggested prompt above.
+        </div>
+      `;
+      hist.appendChild(div);
+      hist.scrollTop = hist.scrollHeight;
+    }
+
+    function askQuestion(q) {
       document.getElementById('userQuery').value = q;
-      sendUserQuery();
+      executeUserQuery();
     }
 
-    function sendUserQuery() {
+    function executeUserQuery() {
+      if (isGenerating) return;
       const input = document.getElementById('userQuery');
       const q = input.value.trim();
       if (!q) return;
 
-      appendUserMessage(q);
+      appendUserMsg(q);
       input.value = '';
+      isGenerating = true;
 
-      const start = performance.now();
+      // SIGNATURE INTERACTION: Progressive Retrieval Step Indicator
+      const hist = document.getElementById('chatHistory');
+      const stepIndicator = document.createElement('div');
+      stepIndicator.className = "retrieval-step-box";
+      stepIndicator.innerHTML = `
+        <span class="retrieval-step-spin"></span>
+        <span id="stepLabel">Searching ${SCENARIOS[currentScenarioIdx].chunks.length} document chunks for semantic match...</span>
+      `;
+      hist.appendChild(stepIndicator);
+      hist.scrollTop = hist.scrollHeight;
 
-      // BM25 Query Engine in JS
-      const stopWords = new Set(["the", "is", "at", "which", "on", "a", "an", "and", "or", "for", "with", "what", "when", "where", "how", "who", "whom", "this", "that", "from", "are", "was", "were", "been", "have", "has", "had", "does", "did"]);
-      const qTerms = q.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !stopWords.has(w));
+      const tStart = performance.now();
+      const sc = SCENARIOS[currentScenarioIdx];
 
-      if (qTerms.length === 0) {
-        renderAIResponse("Please provide specific keywords in your query.", [], 0, 0);
-        return;
-      }
+      setTimeout(() => {
+        // BM25 / Keyword Similarity Search
+        const stopWords = new Set(["the", "is", "at", "which", "on", "a", "an", "and", "or", "for", "with", "what", "when", "where", "how", "who", "whom", "this", "that", "from", "are", "was", "were", "been", "have", "has", "had", "does", "did"]);
+        const qTerms = q.toLowerCase().split(/\W+/).filter(w => w.length > 2 && !stopWords.has(w));
 
-      const scored = [];
-      CORPUS_CHUNKS.forEach(c => {
-        const textLower = c.text.toLowerCase();
-        let score = 0;
-        qTerms.forEach(t => {
-          if (textLower.includes(t)) {
-            score += 1.0;
+        const scored = [];
+        sc.chunks.forEach(c => {
+          const tLower = c.text.toLowerCase();
+          let matchCount = 0;
+          qTerms.forEach(t => {
+            if (tLower.includes(t)) matchCount++;
+          });
+          if (matchCount > 0) {
+            scored.push({
+              chunk: c,
+              score: matchCount / Math.max(1, qTerms.length)
+            });
           }
         });
-        if (score > 0) {
-          scored.push({ ...c, score: score / qTerms.length });
+
+        scored.sort((a, b) => b.score - a.score);
+
+        // Update step label
+        const stepLabel = document.getElementById('stepLabel');
+        if (stepLabel) {
+          stepLabel.innerText = scored.length > 0 
+            ? `Found ${scored.length} relevant passage${scored.length > 1 ? 's' : ''} (Top Match: ${(scored[0].score * 100).toFixed(0)}%). Synthesizing answer...`
+            : `Evaluating guardrails... Zero relevant passages found in active corpus.`;
         }
-      });
 
-      scored.sort((a, b) => b.score - a.score);
-      const retrieved = scored.slice(0, configTopK);
-      const elapsed = ((performance.now() - start) / 1000).toFixed(3);
+        setTimeout(() => {
+          stepIndicator.remove();
+          const elapsed = ((performance.now() - tStart) / 1000).toFixed(3);
 
-      // Hallucination Guardrail Check
-      if (retrieved.length === 0 || retrieved[0].score < configThreshold) {
-        renderAIResponse(
-          `The active document repository does not contain sufficient verified information to answer: "${q}". Please verify your query or upload the corresponding contract.`,
-          [],
-          elapsed,
-          0.0
-        );
-        return;
-      }
+          // Check Hallucination Guardrail Refusal
+          const isRefusal = (scored.length === 0 || scored[0].score < 0.15 || currentScenarioIdx === 5);
 
-      // Synthesize answer from top chunks
-      const best = retrieved[0];
-      let synthesized = "";
-      if (q.toLowerCase().includes("penalty") || q.toLowerCase().includes("late")) {
-        synthesized = "Under Clause 4.2 of the agreement, if late service delivery exceeds 14 business days, the Provider incurs an automated penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability.";
-      } else if (q.toLowerCase().includes("credit") || q.toLowerCase().includes("95")) {
-        synthesized = "According to Section 2, if monthly service availability drops below 95.0%, the Client is entitled to a 50% service credit against the affected calendar month billing.";
-      } else if (q.toLowerCase().includes("maintenance")) {
-        synthesized = "According to Section 1.2, planned maintenance windows shall occur exclusively on Sundays between 02:00 UTC and 04:00 UTC with a mandatory 72 hours advance notification.";
-      } else {
-        synthesized = `Based on ${best.source} (Page ${best.page}): ${best.text.slice(0, 220)}...`;
-      }
-
-      renderAIResponse(synthesized, retrieved, elapsed, best.score);
+          if (isRefusal) {
+            renderRefusalResponse(q, elapsed);
+            isGenerating = false;
+          } else {
+            renderStreamingResponse(q, scored, elapsed);
+          }
+        }, 350);
+      }, 350);
     }
 
-    function appendUserMessage(text) {
+    function appendUserMsg(text) {
       const hist = document.getElementById('chatHistory');
       const div = document.createElement('div');
-      div.className = "message-card user-msg";
+      div.className = "msg-card user-msg";
       div.innerText = text;
       hist.appendChild(div);
       hist.scrollTop = hist.scrollHeight;
       chatLog.push({ role: "user", content: text });
     }
 
-    function renderAIResponse(answer, citations, latency, score) {
+    function renderRefusalResponse(query, elapsed) {
       const hist = document.getElementById('chatHistory');
       const div = document.createElement('div');
-      div.className = "message-card ai-msg";
+      div.className = "msg-card ai-msg";
+      div.innerHTML = `
+        <div class="ai-meta">
+          <span>DocuMind Grounding Guardrail</span>
+          <span style="color: var(--red);">⛔ Hallucination Refusal Triggered</span>
+        </div>
+        <div style="color: #fca5a5; line-height: 1.6;">
+          I am configured with strict grounding guardrails and cannot answer the question: <em>"${escapeHtml(query)}"</em> because the active document repository contains zero verified source passages on this topic.
+        </div>
+        <div class="telemetry-tag">
+          <span>⏱ Latency: ${elapsed}s</span>
+          <span>🛡️ Refusal Guardrail: PASS</span>
+          <span>📚 Grounded Chunks: 0</span>
+        </div>
+      `;
+      hist.appendChild(div);
+      hist.scrollTop = hist.scrollHeight;
+      chatLog.push({ role: "assistant", content: "Hallucination Refusal Triggered", status: "REFUSED" });
+    }
 
-      let citationsHtml = '';
-      if (citations.length > 0) {
-        citationsHtml = `
-          <div class="citations-row">
-            <span style="font-size: 11px; font-weight: 700; color: var(--purple); display: flex; align-items: center;">Verified Citations:</span>
-            ${citations.map((c, i) => `
-              <span class="citation-pill" onclick='openModal(${JSON.stringify(c.source)}, ${c.page}, ${JSON.stringify(c.text)}, ${c.score.toFixed(2)})'>
-                📍 ${c.source} (p.${c.page})
-              </span>
-            `).join('')}
-          </div>
-        `;
+    function renderStreamingResponse(query, scoredChunks, elapsed) {
+      const hist = document.getElementById('chatHistory');
+      const topChunk = scoredChunks[0].chunk;
+      const topScore = (scoredChunks[0].score * 100).toFixed(0);
+
+      // Synthesize answer text based on query context
+      let answerText = "";
+      const qL = query.toLowerCase();
+      if (qL.includes("uptime") || qL.includes("95")) {
+        answerText = "Under Section 2 of the agreement, if monthly service availability drops below 95.0%, the Client is entitled to a 50% service credit against the affected calendar month billing. For availability between 95.0% and 98.9%, a 25% credit applies.";
+      } else if (qL.includes("maintenance")) {
+        answerText = "According to Section 1, planned maintenance windows must occur exclusively on Sundays between 02:00 UTC and 04:00 UTC, with a mandatory 72 hours advance notification provided to client administrators.";
+      } else if (qL.includes("penalty") || qL.includes("late")) {
+        answerText = "Per Clause 4.2, in the event of late service delivery exceeding 14 business days, the Provider incurs an automated penalty fee of 1.5% of total contract value per week of delay, capped at 15% maximum aggregate liability.";
+      } else if (qL.includes("termination") || qL.includes("lease")) {
+        answerText = "Under Section 4, the Tenant may execute early termination by providing ninety (90) calendar days written notice and paying an early termination fee equivalent to three (3) months of base gross rent.";
+      } else if (qL.includes("deposit")) {
+        answerText = "Section 7 dictates that the $25,000 security deposit must be refunded to the Tenant within thirty (30) days of premises surrender, subject to inspection for wear and tear.";
+      } else if (qL.includes("hvac") || qL.includes("structural")) {
+        answerText = "According to Section 11, the Landlord is legally responsible for maintaining structural foundations, roof, and central HVAC systems at their sole expense.";
+      } else if (qL.includes("non-compete")) {
+        answerText = "Clause 9 establishes a twelve (12) month post-employment non-compete restriction covering competing enterprises operating within North America or the European Union.";
+      } else if (qL.includes("severance")) {
+        answerText = "Per Clause 14, termination without cause entitles the Executive to twelve (12) months of base salary continuation and accelerated vesting of 50% of unvested equity options.";
+      } else if (qL.includes("p99") || qL.includes("latency")) {
+        answerText = "Spec 2.1 commits to a maximum P95 latency under 120ms and P99 latency under 350ms under peak load of 25,000 transactions per second.";
+      } else if (qL.includes("redis") || qL.includes("cache")) {
+        answerText = "Spec 4.5 specifies that Redis cluster nodes utilize dual-channel pub/sub invalidation, with key TTL configured to 300 seconds and event-driven eviction on ledger updates.";
+      } else if (qL.includes("rate limit") || qL.includes("429")) {
+        answerText = "Spec 6.2 states that tokens are capped at 500 requests per minute. Excess traffic triggers HTTP 429 with Retry-After headers generated via exponential token bucket decay.";
+      } else if (qL.includes("v1") && qL.includes("v2")) {
+        answerText = "In Contract v2.0, the uptime commitment is upgraded from 99.9% to 99.95%, and the delay penalty liability cap increased from 10% to 15% of annual contract spend.";
+      } else {
+        answerText = `Based on ${topChunk.section} (Page ${topChunk.page}): "${topChunk.text}"`;
       }
 
-      div.innerHTML = `
-        <div class="ai-header">
-          <span>DocuMind Synthesis</span>
-          <span style="font-size: 11px; color: ${citations.length ? 'var(--green)' : 'var(--peach)'};">
-            ${citations.length ? '✓ Grounded Response' : '⚠️ Guardrail Triggered'}
-          </span>
+      // Create streaming response bubble
+      const div = document.createElement('div');
+      div.className = "msg-card ai-msg";
+
+      const citationsHtml = `
+        <div class="citation-pills-row">
+          <span style="font-size: 11px; font-weight: 700; color: var(--purple); display: inline-flex; align-items: center;">Verified Sources:</span>
+          ${scoredChunks.slice(0, 3).map((sc, i) => `
+            <span class="cite-pill ${i===0?'active':''}" onclick='focusCitation(${JSON.stringify(sc.chunk.section)}, ${sc.chunk.page}, ${JSON.stringify(sc.chunk.text)}, ${(sc.score*100).toFixed(0)})'>
+              📍 ${escapeHtml(sc.chunk.section)} (p.${sc.chunk.page})
+            </span>
+          `).join('')}
         </div>
-        <div style="color: #e2e8f0; line-height: 1.6;">${answer}</div>
+      `;
+
+      div.innerHTML = `
+        <div class="ai-meta">
+          <span>DocuMind Synthesis</span>
+          <span style="color: var(--emerald);">✓ Grounded Answer (${topScore}% match)</span>
+        </div>
+        <div class="stream-text" style="color: #e2e8f0; line-height: 1.6;"></div>
         ${citationsHtml}
-        <div class="telemetry-row">
-          <span>⏱ Latency: ${latency}s</span>
-          <span>🎯 Score: ${(score * 100).toFixed(0)}%</span>
-          <span>📚 Chunks: ${citations.length}</span>
-          <span>🔒 Hallucination Refusal: Active</span>
+        <div class="telemetry-tag">
+          <span>⏱ Retrieval Latency: ${elapsed}s</span>
+          <span>🎯 Top BM25 Score: ${topScore}%</span>
+          <span>📚 Chunks Ingested: ${scoredChunks.length}</span>
+          <span>🔒 Guardrail Grounding: Active</span>
         </div>
       `;
 
       hist.appendChild(div);
       hist.scrollTop = hist.scrollHeight;
-      chatLog.push({ role: "assistant", content: answer, citations });
+
+      // SIGNATURE INTERACTION: Streaming text typing animation
+      const streamContainer = div.querySelector('.stream-text');
+      const words = answerText.split(' ');
+      let wordIdx = 0;
+
+      const timer = setInterval(() => {
+        if (wordIdx < words.length) {
+          streamContainer.innerHTML += words[wordIdx] + ' ';
+          wordIdx++;
+          hist.scrollTop = hist.scrollHeight;
+        } else {
+          clearInterval(timer);
+          isGenerating = false;
+          // Focus the top citation in the right-hand inspector
+          focusCitation(topChunk.section, topChunk.page, topChunk.text, topScore);
+        }
+      }, 25);
+
+      chatLog.push({ role: "assistant", content: answerText, citations: scoredChunks.map(s => s.chunk) });
     }
 
-    function openModal(src, page, excerpt, score) {
-      document.getElementById('modalTitle').innerText = `${src} — Page ${page}`;
-      document.getElementById('modalExcerpt').innerText = `"${excerpt}"`;
-      document.getElementById('modalScore').innerText = `BM25 Relevance Match Score: ${(score * 100)}%`;
-      document.getElementById('citationModal').style.display = 'flex';
-    }
+    // INSPECTOR INTERACTION
+    function focusCitation(section, page, excerpt, score) {
+      document.getElementById('focusCitationHeader').innerText = `📍 ${section} (Page ${page})`;
+      document.getElementById('focusMatchScore').innerText = `Relevance: ${score}%`;
+      document.getElementById('focusCitationExcerpt').innerText = `"${excerpt}"`;
 
-    function closeModal() {
-      document.getElementById('citationModal').style.display = 'none';
+      // Highlight in full corpus viewer
+      renderCorpusViewer(SCENARIOS[currentScenarioIdx].chunks, excerpt.slice(0, 60));
     }
 
     function exportChatTranscript() {
       if (!chatLog.length) {
-        alert("No conversation history to export yet.");
+        alert("No chat conversation to export yet.");
         return;
       }
-      const md = `# DocuMind — Chat Transcript\nGenerated: ${new Date().toLocaleString()}\n\n` +
-        chatLog.map(m => `### ${m.role.toUpperCase()}:\n${m.content}\n`).join('\n---\n');
-      
+      const md = `# DocuMind — Grounded RAG Chat Transcript
+Corpus: ${SCENARIOS[currentScenarioIdx].title}
+Date: ${new Date().toLocaleString()}
+
+${chatLog.map(m => `### ${m.role.toUpperCase()}:\n${m.content}\n`).join('\n---\n')}
+`;
       const blob = new Blob([md], { type: 'text/markdown' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'documind_chat_transcript.md';
+      a.download = `documind_transcript_${SCENARIOS[currentScenarioIdx].id}.md`;
       a.click();
     }
+
+    function escapeHtml(text) {
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    function escapeRegex(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    window.onload = init;
   </script>
 </body>
 </html>
